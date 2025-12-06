@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kuis Akhir — Data & Sistem Informasi</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg,#667eea,#764ba2);
+        margin: 0;
+        padding: 0;
+        color: #fff;
+    }
+
+    .container {
+        width: 92%;
+        max-width: 900px;
+        margin: 35px auto;
+        background: rgba(255,255,255,0.95);
+        padding: 30px;
+        border-radius: 18px;
+        color: #333;
+        box-shadow: 0 0 18px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+        text-align: center;
+        color: #5a2ec7;
+        margin-bottom: 10px;
+    }
+
+    .timer {
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 12px;
+        background: #ffca28;
+        border-radius: 10px;
+        color: #000;
+    }
+
+    .question {
+        margin-bottom: 22px;
+        padding: 17px;
+        background: #eef3ff;
+        border-left: 5px solid #5a2ec7;
+        border-radius: 10px;
+    }
+
+    button {
+        background: #5a2ec7;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        font-size: 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: block;
+        margin: 25px auto;
+    }
+
+    button:hover {
+        background: #4722a3;
+    }
+
+    .result {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        background: #d4edda;
+        color: #155724;
+        margin-top: 20px;
+        border-radius: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>KUIS AKHIR — Data & Sistem Informasi</h1>
+
+    <div class="timer" id="timer">Waktu: 10:00</div>
+
+    <form id="quizForm">
+
+        <label>Nama:</label><br>
+        <input type="text" id="nama" required style="width:100%; padding:8px;"><br><br>
+
+        <label>NIM:</label><br>
+        <input type="text" id="nim" required style="width:100%; padding:8px;"><br><br>
+
+        <div id="questions"></div>
+
+        <button type="button" onclick="submitQuiz()">Kirim Jawaban</button>
+
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4R9-aefyho45VEqBSt-OrGzHtgzNdouzzf8w1dveG7aW3wGVnBDUHe9jRH9tbnq4mQ/exec";
+
+const questionsData = [
+    {q: "1. Manakah yang termasuk contoh data mentah (raw data)?", a: "D", 
+     options: ["Laporan nilai mahasiswa", "Grafik perkembangan kehadiran", "Rekap nilai akhir", "Nilai: 70, 85, 90, 60"]},
+
+    {q: "2. Informasi diperoleh dari data dengan cara…", a: "C", 
+     options: ["Menghapus data", "Mengcopy data", "Mengolah dan menganalisis data", "Mengurutkan file di folder"]},
+
+    {q: "3. Dalam sistem informasi, komponen yang berperan mengambil keputusan adalah…", a: "A", 
+     options: ["Manusia", "Hardware", "Software", "Network"]},
+
+    {q: "4. Rumus Excel untuk menghitung jumlah ‘H’ pada rentang D2:H2 adalah…", a: "B", 
+     options: ["=SUM(D2:H2)", "=COUNTIF(D2:H2,\"H\")", "=COUNTA(D2:H2)", "=COUNT(D2:H2)"]},
+
+    {q: "5. Jika kehadiran mahasiswa = 3 dari 4 pertemuan, rumus persentase yang benar adalah…", a: "A", 
+     options: ["=3/4", "=3*4", "=3+4", "=3-4"]},
+
+    {q: "6. Manakah fungsi Excel yang bisa digunakan untuk menghitung jumlah berdasarkan 2 kriteria?", a: "D", 
+     options: ["COUNT", "COUNTIF", "SUMIF", "COUNTIFS"]},
+
+    {q: "7. Rumus untuk menentukan lulus jika nilai ≥ 75% dan tidak lulus jika sebaliknya:", a: "C", 
+     options: ["=IF(A1>75,\"L\",\"TL\")", "=IF(A1=75,\"L\",\"TL\")", "=IF(A1>=0.75,\"Lulus\",\"Tidak Lulus\")", "=IF(A1<=0.75,\"Lulus\",\"Tidak Lulus\")"]},
+
+    {q: "8. Grafik terbaik untuk membandingkan jumlah Lulus vs Tidak Lulus adalah…", a: "B", 
+     options: ["Line Chart", "Pie Chart", "Scatter Chart", "Area Chart"]},
+
+    {q: "9. Grafik terbaik untuk memantau tren kehadiran mahasiswa per pertemuan adalah…", a: "A", 
+     options: ["Line Chart", "Pie Chart", "Histogram", "Radar Chart"]},
+
+    {q: "10. Fitur Excel yang digunakan untuk menampilkan laporan ringkas otomatis (pivot) adalah…", a: "C", 
+     options: ["Data Validation", "Subtotal", "PivotTable", "Sort & Filter"]},
+
+    {q: "11. Jika semua kolom berisi ‘A’, maka =COUNTIF(D4:G4,\"H\") menghasilkan…", a: "A", 
+     options: ["0", "1", "2", "Error"]},
+
+    {q: "12. Apa fungsi utama dashboard dalam sistem informasi?", a: "D", 
+     options: ["Menginput data", "Membuat tabel", "Menyimpan file", "Menyajikan ringkasan data secara visual"]},
+
+    {q: "13. Rumus untuk menghitung rata-rata kehadiran dari H2:H11 adalah…", a: "B", 
+     options: ["=SUM(H2:H11)", "=AVERAGE(H2:H11)", "=COUNT(H2:H11)", "=IF(H2:H11)"]},
+
+    {q: "14. Pada Excel, huruf 'I' pada kolom kehadiran berarti…", a: "C", 
+     options: ["Hadir", "Alfa", "Izin", "Invalid"]},
+
+    {q: "15. Jika jumlah hadir = 4 dan alfa = 1 dari total 5 pertemuan, persentase hadir adalah…", a: "C", 
+     options: ["60%", "70%", "80%", "90%"]},
+
+    {q: "16. Cara tercepat untuk membuat grafik dari tabel data adalah…", a: "A", 
+     options: ["Select data → Insert → Chart", "Restart Excel", "Klik kanan lalu copy", "Save as PDF"]},
+
+    {q: "17. Excel akan membaca huruf sebagai…", a: "D", 
+     options: ["Angka", "Formula", "Logika", "Teks"]},
+
+    {q: "18. Untuk mencari jumlah mahasiswa yang memiliki nilai hadir ≥ 75%, digunakan…", a: "B", 
+     options: ["SUMIFS", "COUNTIF", "AVERAGEIFS", "MAXIF"]},
+
+    {q: "19. Manakah yang termasuk karakteristik data berkualitas?", a: "C", 
+     options: ["Warna-warni", "Filternya banyak", "Akurat & relevan", "Besar ukurannya"]},
+
+    {q: "20. Dashboard biasanya terdiri dari…", a: "A", 
+     options: ["Grafik, tabel ringkas, indikator", "Folder dan file", "Video dan audio", "Daftar warna"]},
+];
+
+function loadQuestions() {
+    let container = document.getElementById("questions");
+    let html = "";
+
+    questionsData.forEach((item, index) => {
+        html += `
+        <div class="question">
+            <p>${item.q}</p>
+            ${item.options.map((opt, i) => `
+                <label>
+                    <input type="radio" name="q${index}" value="${String.fromCharCode(65+i)}"> 
+                    ${String.fromCharCode(65+i)}. ${opt}
+                </label><br>
+            `).join("")}
+        </div>`;
+    });
+
+    container.innerHTML = html;
+}
+loadQuestions();
+
+// TIMER 10 MENIT
+let timeLeft = 600;
+const timerElement = document.getElementById("timer");
+
+let timer = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+
+    timerElement.textContent = `Waktu: ${minutes}:${seconds < 10 ? "0"+seconds : seconds}`;
+
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        submitQuiz();
+    }
+
+    timeLeft--;
+}, 1000);
+
+function submitQuiz() {
+    clearInterval(timer);
+
+    document.querySelectorAll("input[type=radio]").forEach(el => el.disabled = true);
+    document.querySelector("button").disabled = true;
+
+    let score = 0;
+    let answers = [];
+
+    questionsData.forEach((q, i) => {
+        let answer = document.querySelector(`input[name="q${i}"]:checked`);
+        let val = answer ? answer.value : "-";
+        answers.push(val);
+        if (val === q.a) score++;
+    });
+
+    document.getElementById("result").innerHTML = 
+        `<div class="result">Nilai Anda: <b>${score} / ${questionsData.length}</b></div>`;
+}
+</script>
+
+</body>
+</html>
